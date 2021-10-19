@@ -19,7 +19,8 @@
         </Grid.ColumnDefinitions>
 
         <DockPanel>
-            <TextBox Height="25" DockPanel.Dock="Top" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Height="25" DockPanel.Dock="Top" 
+                     Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Height="25" DockPanel.Dock="Top" Content="Connect" 
                     Command="{Binding ConnectToServerCommand}"/>
             <ListView ItemsSource="{Binding Users}">
@@ -32,7 +33,8 @@
         </DockPanel>
 
         <StackPanel Grid.Column="1">
-            <ListView Height="380"/>
+            <ListView Height="380"
+                      ItemsSource="{Binding Messages}"/>
             <StackPanel Orientation="Horizontal">
                 <TextBox Height="55" Width="545" 
                          Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"/>

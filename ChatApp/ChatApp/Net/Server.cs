@@ -12,6 +12,8 @@ namespace ChatClient.Net
     {
         public PacketReader PacketReader;
         public Action connectedEvent;
+        public Action messageReceivedEvent;
+        public Action userDisconnectEvent;
 
         private TcpClient _client;
 
@@ -57,6 +59,12 @@ namespace ChatClient.Net
                     {
                         case 1:
                             connectedEvent?.Invoke();
+                            break;
+                        case 5:
+                            messageReceivedEvent?.Invoke();
+                            break;
+                        case 10:
+                            userDisconnectEvent?.Invoke();
                             break;
                         default:
                             Console.WriteLine("Something went wrong...");

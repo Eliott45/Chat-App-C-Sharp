@@ -26,6 +26,8 @@ namespace ChatServer
             Username = _packetReader.ReadMessage();
 
             Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {Username}");
+
+            Task.Run(() => Process());
         }
 
         private void Process()
@@ -40,7 +42,7 @@ namespace ChatServer
                         case 5:
                             var msg = _packetReader.ReadMessage();
                             Console.WriteLine($"[{DateTime.Now}]: Message received: {msg}");
-                            Program.BroadcastMessage(msg);
+                            Program.BroadcastMessage($"[{DateTime.Now}]: [{Username}] send: {msg}");
                             break;
                         default:
                             break;
@@ -48,8 +50,9 @@ namespace ChatServer
                 } catch (Exception)
                 {
                     Console.WriteLine($"[{DateTime.Now}]: [{UID.ToString()}] diconnected!");
+                    Program.BroadcastDisconnect(UID.ToString());
                     ClientSocket.Close();
-                    throw;
+                    break;
                 }
             }
         }
