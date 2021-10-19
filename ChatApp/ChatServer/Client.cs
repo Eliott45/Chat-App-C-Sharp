@@ -1,9 +1,6 @@
 ﻿using ChatServer.Net.IO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChatServer
@@ -14,7 +11,7 @@ namespace ChatServer
         public Guid UID { get; set; }
         public TcpClient ClientSocket { get; set; }
 
-        private PacketReader _packetReader;
+        private readonly PacketReader _packetReader;
 
         public Client(TcpClient client)
         {
@@ -42,14 +39,14 @@ namespace ChatServer
                         case 5:
                             var msg = _packetReader.ReadMessage();
                             Console.WriteLine($"[{DateTime.Now}]: Message received: {msg}");
-                            Program.BroadcastMessage($"[{DateTime.Now}]: [{Username}] send: {msg}");
+                            Program.BroadcastMessage($"[{DateTime.Now.ToShortTimeString()}] [{Username}]: {msg}");
                             break;
                         default:
                             break;
                     }
                 } catch (Exception)
                 {
-                    Console.WriteLine($"[{DateTime.Now}]: [{UID.ToString()}] diconnected!");
+                    Console.WriteLine($"[{DateTime.Now}] [{UID}] diconnected!");
                     Program.BroadcastDisconnect(UID.ToString());
                     ClientSocket.Close();
                     break;

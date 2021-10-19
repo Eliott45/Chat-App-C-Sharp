@@ -1,9 +1,6 @@
 ﻿using ChatClient.Net.IO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChatClient.Net
@@ -15,7 +12,7 @@ namespace ChatClient.Net
         public Action messageReceivedEvent;
         public Action userDisconnectEvent;
 
-        private TcpClient _client;
+        private readonly TcpClient _client;
 
         public Server()
         {
@@ -47,6 +44,7 @@ namespace ChatClient.Net
             messagePaket.WriteOpCode(5);
             messagePaket.WriteMessage(message);
             _client.Client.Send(messagePaket.GetPacketBytes());
+
         }
 
         private void ReadPackets()
