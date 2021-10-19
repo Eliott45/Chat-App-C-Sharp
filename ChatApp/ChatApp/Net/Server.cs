@@ -39,6 +39,14 @@ namespace ChatClient.Net
             }
         }
 
+        public void SendMessageToServer(string message)
+        {
+            var messagePaket = new PacketBuilder();
+            messagePaket.WriteOpCode(5);
+            messagePaket.WriteMessage(message);
+            _client.Client.Send(messagePaket.GetPacketBytes());
+        }
+
         private void ReadPackets()
         {
             Task.Run(() => {
@@ -57,5 +65,6 @@ namespace ChatClient.Net
                 }
             });
         }
+
     }
 }
