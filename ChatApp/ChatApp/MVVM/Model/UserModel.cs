@@ -1,8 +1,8 @@
 ﻿namespace ChatClient.MVVM.Model
 {
-    class UserModel
+    internal class UserModel
     {
         public string Username { get; set; }
-        public string UID { get; set; }
+        public string Uid { get; set; }
     }
 }

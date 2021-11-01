@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace ChatClient.Net
 {
-    class Server
+    internal class Server
     {
         public PacketReader PacketReader;
-        public Action connectedEvent;
-        public Action messageReceivedEvent;
-        public Action userDisconnectEvent;
+        public Action ConnectedEvent;
+        public Action MessageReceivedEvent;
+        public Action UserDisconnectEvent;
 
         private readonly TcpClient _client;
 
@@ -21,21 +21,19 @@ namespace ChatClient.Net
 
         public void ConnectToServer(string username)
         {
-            if (!_client.Connected)
+            if (_client.Connected) return;
+            _client.Connect("127.0.0.1", 7891);
+            PacketReader = new PacketReader(_client.GetStream());
+
+            if(!string.IsNullOrEmpty(username))
             {
-                _client.Connect("127.0.0.1", 7891);
-                PacketReader = new PacketReader(_client.GetStream());
-
-                if(!string.IsNullOrEmpty(username))
-                {
-                    var connectPacket = new PacketBuilder();
-                    connectPacket.WriteOpCode(0);
-                    connectPacket.WriteMessage(username);
-                    _client.Client.Send(connectPacket.GetPacketBytes());
-                }
-
-                ReadPackets(); 
+                var connectPacket = new PacketBuilder();
+                connectPacket.WriteOpCode(0);
+                connectPacket.WriteMessage(username);
+                _client.Client.Send(connectPacket.GetPacketBytes());
             }
+
+            ReadPackets();
         }
 
         public void SendMessageToServer(string message)
@@ -44,7 +42,6 @@ namespace ChatClient.Net
             messagePaket.WriteOpCode(5);
             messagePaket.WriteMessage(message);
             _client.Client.Send(messagePaket.GetPacketBytes());
-
         }
 
         private void ReadPackets()
@@ -56,13 +53,13 @@ namespace ChatClient.Net
                     switch (opcode)
                     {
                         case 1:
-                            connectedEvent?.Invoke();
+                            ConnectedEvent?.Invoke();
                             break;
                         case 5:
-                            messageReceivedEvent?.Invoke();
+                            MessageReceivedEvent?.Invoke();
                             break;
                         case 10:
-                            userDisconnectEvent?.Invoke();
+                            UserDisconnectEvent?.Invoke();
                             break;
                         default:
                             Console.WriteLine("Something went wrong...");

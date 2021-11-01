@@ -40,6 +40,8 @@ namespace ChatServer
                     user.ClientSocket.Client.Send(broadcastPacket.GetPacketBytes());
                 }
             }
+
+            BroadcastMessage($"User [{_users[_users.Count -1 ].Username}] connected!");
         }
 
         public static void BroadcastMessage(string message)
@@ -66,7 +68,7 @@ namespace ChatServer
                 user.ClientSocket.Client.Send(broadcastPacket.GetPacketBytes());
             }
 
-            BroadcastMessage($"[{disconnectedUser.Username}] disconnected!");
+            BroadcastMessage($"User [{disconnectedUser.Username}] disconnected!");
         }
     }
 }

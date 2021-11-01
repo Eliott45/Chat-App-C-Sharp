@@ -4,9 +4,9 @@ using System.Text;
 
 namespace ChatClient.Net.IO
 {
-    class PacketBuilder
+    internal class PacketBuilder
     {
-        private MemoryStream _ms;
+        private readonly MemoryStream _ms;
 
         public PacketBuilder()
         {

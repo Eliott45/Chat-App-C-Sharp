@@ -4,9 +4,9 @@ using System.Text;
 
 namespace ChatClient.Net.IO
 {
-    class PacketReader : BinaryReader
+    internal class PacketReader : BinaryReader
     {
-        private NetworkStream _ns;
+        private readonly NetworkStream _ns;
 
         public PacketReader(NetworkStream ns) : base(ns)
         {
@@ -15,11 +15,9 @@ namespace ChatClient.Net.IO
 
         public string ReadMessage()
         {
-            byte[] msgBuffer;
             var length = ReadInt32();
-            msgBuffer = new byte[length];
+            var msgBuffer = new byte[length];
             _ns.Read(msgBuffer, 0, length);
-
             var msg = Encoding.ASCII.GetString(msgBuffer);
             return msg;
         }

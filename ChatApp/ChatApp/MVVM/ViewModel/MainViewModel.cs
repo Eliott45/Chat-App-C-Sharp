@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace ChatClient.MVVM.ViewModel
 {
-    class MainViewModel
+    internal class MainViewModel : ObservableObject
     {
         public ObservableCollection<UserModel> Users { get; set; }
         public ObservableCollection<string> Messages { get; set; }
@@ -15,7 +15,18 @@ namespace ChatClient.MVVM.ViewModel
         public RelayCommand SendMessageCommand { get; set; }
 
         public string Username { get; set; }
-        public string Message { get; set; }
+
+        private string _message;
+        
+        public string Message
+        {
+            get => _message;
+            set
+            {
+                _message = value; 
+                OnPropertyChanged();
+            }
+        }
 
         private readonly Server _server;
 
@@ -24,13 +35,16 @@ namespace ChatClient.MVVM.ViewModel
             Users = new ObservableCollection<UserModel>();
             Messages = new ObservableCollection<string>();
             _server = new Server();
-            _server.connectedEvent += UserConnected;
-            _server.messageReceivedEvent += MessegeReceived;
-            _server.userDisconnectEvent += UserDisconnect;
+            _server.ConnectedEvent += UserConnected;
+            _server.MessageReceivedEvent += MessageReceived;
+            _server.UserDisconnectEvent += UserDisconnect;
 
-            ConnectToServerCommand = new RelayCommand(o => _server.ConnectToServer(Username), o => !string.IsNullOrEmpty(Username));
+            ConnectToServerCommand = new RelayCommand(o => _server.ConnectToServer(Username), 
+                o => !string.IsNullOrEmpty(Username));
 
-            SendMessageCommand = new RelayCommand(o => _server.SendMessageToServer(Message), o => !string.IsNullOrEmpty(Message));
+            SendMessageCommand = new RelayCommand(o => {
+                _server.SendMessageToServer(Message);
+            }, o => !string.IsNullOrEmpty(Message));
         }
 
         private void UserConnected()
@@ -38,10 +52,10 @@ namespace ChatClient.MVVM.ViewModel
             var user = new UserModel
             {
                 Username = _server.PacketReader.ReadMessage(),
-                UID = _server.PacketReader.ReadMessage(),
+                Uid = _server.PacketReader.ReadMessage(),
             };
 
-            if(!Users.Any(x => x.UID == user.UID))
+            if(Users.All(x => x.Uid != user.Uid))
             {
                 Application.Current.Dispatcher.Invoke(() => Users.Add(user));
             }
@@ -50,17 +64,18 @@ namespace ChatClient.MVVM.ViewModel
         private void UserDisconnect()
         {
             var uid = _server.PacketReader.ReadMessage();
-            var user = Users.Where(x => x.UID == uid).FirstOrDefault();
+            var user = Users.FirstOrDefault(x => x.Uid == uid);
             Application.Current.Dispatcher.Invoke(() => Users.Remove(user));
         }
 
-        private void MessegeReceived()
+        private void MessageReceived()
         {
             var msg = _server.PacketReader.ReadMessage();
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Messages.Add(msg);
             });
+            Message = "";
         }
 
     }
