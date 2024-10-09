@@ -14,6 +14,8 @@ internal class Server
 
     private readonly TcpClient _client;
 
+    public bool IsConnected => _client.Connected;
+
     public Server()
     {
         _client = new TcpClient();
@@ -43,7 +45,6 @@ internal class Server
             Console.WriteLine($"Connection failed: {ex.Message}");
         }
     }
-
 
     public void SendMessageToServer(string message)
     {

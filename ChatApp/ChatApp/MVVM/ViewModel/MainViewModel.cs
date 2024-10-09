@@ -14,10 +14,8 @@ internal class MainViewModel : ObservableObject, IDisposable
     public ObservableCollection<string> Messages { get; set; }
     public RelayCommand ConnectToServerCommand { get; set; }
     public RelayCommand SendMessageCommand { get; set; }
-
+    public string IpAddress { get; set; }
     public string Username { get; set; }
-
-    private string _message;
 
     public string Message
     {
@@ -29,9 +27,10 @@ internal class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    public string IpAddress { get; set; }
-
     private readonly Server _server;
+
+    private bool _connectedToServer;
+    private string _message;
 
     public MainViewModel()
     {
@@ -78,7 +77,7 @@ internal class MainViewModel : ObservableObject, IDisposable
         !string.IsNullOrEmpty(IpAddress) && !string.IsNullOrEmpty(Username);
 
     private bool CanSendMessage() =>
-        !string.IsNullOrEmpty(Message);
+        !string.IsNullOrEmpty(Message) && _server.IsConnected;
 
     private void OnUserConnected()
     {
