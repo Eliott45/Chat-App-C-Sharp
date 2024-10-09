@@ -3,29 +3,32 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace ChatClient.Net
+namespace ChatClient.Net;
+
+internal class Server
 {
-    internal class Server
+    public PacketReader PacketReader;
+    public Action ConnectedEvent;
+    public Action MessageReceivedEvent;
+    public Action UserDisconnectEvent;
+
+    private readonly TcpClient _client;
+
+    public Server()
     {
-        public PacketReader PacketReader;
-        public Action ConnectedEvent;
-        public Action MessageReceivedEvent;
-        public Action UserDisconnectEvent;
+        _client = new TcpClient();
+    }
 
-        private readonly TcpClient _client;
+    public void ConnectToServer(string ipAddress, string username)
+    {
+        if (_client.Connected) return;
 
-        public Server()
+        try
         {
-            _client = new TcpClient();
-        }
-
-        public void ConnectToServer(string ipAddress, string username)
-        {
-            if (_client.Connected) return;
             _client.Connect(ipAddress, 7891);
             PacketReader = new PacketReader(_client.GetStream());
 
-            if(!string.IsNullOrEmpty(username))
+            if (!string.IsNullOrEmpty(username))
             {
                 var connectPacket = new PacketBuilder();
                 connectPacket.WriteOpCode(0);
@@ -35,19 +38,28 @@ namespace ChatClient.Net
 
             ReadPackets();
         }
-
-        public void SendMessageToServer(string message)
+        catch (SocketException ex)
         {
-            var messagePaket = new PacketBuilder();
-            messagePaket.WriteOpCode(5);
-            messagePaket.WriteMessage(message);
-            _client.Client.Send(messagePaket.GetPacketBytes());
+            Console.WriteLine($"Connection failed: {ex.Message}");
         }
+    }
 
-        private void ReadPackets()
+
+    public void SendMessageToServer(string message)
+    {
+        var messagePaket = new PacketBuilder();
+        messagePaket.WriteOpCode(5);
+        messagePaket.WriteMessage(message);
+        _client.Client.Send(messagePaket.GetPacketBytes());
+    }
+
+    private void ReadPackets()
+    {
+        Task.Run(() =>
         {
-            Task.Run(() => {
-                while (true)
+            try
+            {
+                while (_client.Connected)
                 {
                     var opcode = PacketReader.ReadByte();
                     switch (opcode)
@@ -66,8 +78,11 @@ namespace ChatClient.Net
                             break;
                     }
                 }
-            });
-        }
-
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while reading packets: {ex.Message}");
+            }
+        });
     }
 }
