@@ -17,16 +17,18 @@ namespace ChatClient.MVVM.ViewModel
         public string Username { get; set; }
 
         private string _message;
-        
+
         public string Message
         {
             get => _message;
             set
             {
-                _message = value; 
+                _message = value;
                 OnPropertyChanged();
             }
         }
+
+        public string IpAddress { get; set; }
 
         private readonly Server _server;
 
@@ -39,8 +41,10 @@ namespace ChatClient.MVVM.ViewModel
             _server.MessageReceivedEvent += MessageReceived;
             _server.UserDisconnectEvent += UserDisconnect;
 
-            ConnectToServerCommand = new RelayCommand(o => _server.ConnectToServer(Username), 
-                o => !string.IsNullOrEmpty(Username));
+            ConnectToServerCommand = new RelayCommand(o =>
+            {
+                _server.ConnectToServer(IpAddress, Username);
+            }, o => !string.IsNullOrEmpty(IpAddress) && !string.IsNullOrEmpty(Username));
 
             SendMessageCommand = new RelayCommand(o => {
                 _server.SendMessageToServer(Message);

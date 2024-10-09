@@ -24,7 +24,7 @@ namespace ChatServer
 
             Console.WriteLine($"[{DateTime.Now}]: Client has connected with the username: {Username}");
 
-            Task.Run(() => Process());
+            Task.Run(Process);
         }
 
         private void Process()
@@ -41,12 +41,10 @@ namespace ChatServer
                             Console.WriteLine($"[{DateTime.Now}]: Message received: {msg}");
                             Program.BroadcastMessage($"[{DateTime.Now.ToShortTimeString()}] [{Username}]: {msg}");
                             break;
-                        default:
-                            break;
                     }
                 } catch (Exception)
                 {
-                    Console.WriteLine($"[{DateTime.Now}] [{UID}] diconnected!");
+                    Console.WriteLine($"[{DateTime.Now}] [{UID}] disconnected!");
                     Program.BroadcastDisconnect(UID.ToString());
                     ClientSocket.Close();
                     break;

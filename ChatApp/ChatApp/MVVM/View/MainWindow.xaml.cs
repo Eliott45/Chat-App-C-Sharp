@@ -6,7 +6,7 @@ namespace ChatClient.MVVM.View
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow 
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -26,6 +26,7 @@ namespace ChatClient.MVVM.View
             if (Application.Current.MainWindow != null)
                 Application.Current.MainWindow.WindowState = WindowState.Minimized;
         }
+
         private void WindowStateButton_Click(object sender, RoutedEventArgs e)
         {
             if (Application.Current.MainWindow != null)

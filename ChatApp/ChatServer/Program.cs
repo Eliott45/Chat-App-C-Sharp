@@ -8,8 +8,8 @@ namespace ChatServer
 {
     class Program
     {
-        static List<Client> _users;
-        static TcpListener _listener;
+        private static List<Client> _users;
+        private static TcpListener _listener;
 
         static void Main(string[] args)
         {
@@ -41,7 +41,7 @@ namespace ChatServer
                 }
             }
 
-            BroadcastMessage($"User [{_users[_users.Count -1 ].Username}] connected!");
+            BroadcastMessage($"User [{_users[^1 ].Username}] connected!");
         }
 
         public static void BroadcastMessage(string message)
@@ -57,7 +57,7 @@ namespace ChatServer
 
         public static void BroadcastDisconnect(string uid)
         {
-            var disconnectedUser = _users.Where(x => x.UID.ToString() == uid).FirstOrDefault();
+            var disconnectedUser = _users.FirstOrDefault(x => x.UID.ToString() == uid);
             _users.Remove(disconnectedUser);
 
             foreach (var user in _users)
@@ -68,7 +68,7 @@ namespace ChatServer
                 user.ClientSocket.Client.Send(broadcastPacket.GetPacketBytes());
             }
 
-            BroadcastMessage($"User [{disconnectedUser.Username}] disconnected!");
+            BroadcastMessage($"User [{disconnectedUser?.Username}] disconnected!");
         }
     }
 }

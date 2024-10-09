@@ -19,10 +19,10 @@ namespace ChatClient.Net
             _client = new TcpClient();
         }
 
-        public void ConnectToServer(string username)
+        public void ConnectToServer(string ipAddress, string username)
         {
             if (_client.Connected) return;
-            _client.Connect("127.0.0.1", 7891);
+            _client.Connect(ipAddress, 7891);
             PacketReader = new PacketReader(_client.GetStream());
 
             if(!string.IsNullOrEmpty(username))
