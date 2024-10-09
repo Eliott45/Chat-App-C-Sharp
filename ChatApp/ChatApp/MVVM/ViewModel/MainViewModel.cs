@@ -5,82 +5,79 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 
-namespace ChatClient.MVVM.ViewModel
+namespace ChatClient.MVVM.ViewModel;
+
+internal class MainViewModel : ObservableObject
 {
-    internal class MainViewModel : ObservableObject
+    public ObservableCollection<UserModel> Users { get; set; }
+    public ObservableCollection<string> Messages { get; set; }
+    public RelayCommand ConnectToServerCommand { get; set; }
+    public RelayCommand SendMessageCommand { get; set; }
+
+    public string Username { get; set; }
+
+    private string _message;
+
+    public string Message
     {
-        public ObservableCollection<UserModel> Users { get; set; }
-        public ObservableCollection<string> Messages { get; set; }
-        public RelayCommand ConnectToServerCommand { get; set; }
-        public RelayCommand SendMessageCommand { get; set; }
-
-        public string Username { get; set; }
-
-        private string _message;
-
-        public string Message
+        get => _message;
+        set
         {
-            get => _message;
-            set
-            {
-                _message = value;
-                OnPropertyChanged();
-            }
+            _message = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string IpAddress { get; set; }
+    public string IpAddress { get; set; }
 
-        private readonly Server _server;
+    private readonly Server _server;
 
-        public MainViewModel()
+    public MainViewModel()
+    {
+        Users = new ObservableCollection<UserModel>();
+        Messages = new ObservableCollection<string>();
+        _server = new Server();
+        _server.ConnectedEvent += UserConnected;
+        _server.MessageReceivedEvent += MessageReceived;
+        _server.UserDisconnectEvent += UserDisconnect;
+
+        ConnectToServerCommand = new RelayCommand(o =>
         {
-            Users = new ObservableCollection<UserModel>();
-            Messages = new ObservableCollection<string>();
-            _server = new Server();
-            _server.ConnectedEvent += UserConnected;
-            _server.MessageReceivedEvent += MessageReceived;
-            _server.UserDisconnectEvent += UserDisconnect;
+            _server.ConnectToServer(IpAddress, Username);
+        }, o => !string.IsNullOrEmpty(IpAddress) && !string.IsNullOrEmpty(Username));
 
-            ConnectToServerCommand = new RelayCommand(o =>
-            {
-                _server.ConnectToServer(IpAddress, Username);
-            }, o => !string.IsNullOrEmpty(IpAddress) && !string.IsNullOrEmpty(Username));
+        SendMessageCommand = new RelayCommand(o => {
+            _server.SendMessageToServer(Message);
+        }, o => !string.IsNullOrEmpty(Message));
+    }
 
-            SendMessageCommand = new RelayCommand(o => {
-                _server.SendMessageToServer(Message);
-            }, o => !string.IsNullOrEmpty(Message));
-        }
-
-        private void UserConnected()
+    private void UserConnected()
+    {
+        var user = new UserModel
         {
-            var user = new UserModel
-            {
-                Username = _server.PacketReader.ReadMessage(),
-                Uid = _server.PacketReader.ReadMessage(),
-            };
+            Username = _server.PacketReader.ReadMessage(),
+            Uid = _server.PacketReader.ReadMessage(),
+        };
 
-            if(Users.All(x => x.Uid != user.Uid))
-            {
-                Application.Current.Dispatcher.Invoke(() => Users.Add(user));
-            }
-        }
-
-        private void UserDisconnect()
+        if(Users.All(x => x.Uid != user.Uid))
         {
-            var uid = _server.PacketReader.ReadMessage();
-            var user = Users.FirstOrDefault(x => x.Uid == uid);
-            Application.Current.Dispatcher.Invoke(() => Users.Remove(user));
+            Application.Current.Dispatcher.Invoke(() => Users.Add(user));
         }
+    }
 
-        private void MessageReceived()
+    private void UserDisconnect()
+    {
+        var uid = _server.PacketReader.ReadMessage();
+        var user = Users.FirstOrDefault(x => x.Uid == uid);
+        Application.Current.Dispatcher.Invoke(() => Users.Remove(user));
+    }
+
+    private void MessageReceived()
+    {
+        var msg = _server.PacketReader.ReadMessage();
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            var msg = _server.PacketReader.ReadMessage();
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Messages.Add(msg);
-            });
-            Message = "";
-        }
-
+            Messages.Add(msg);
+        });
     }
 }
