@@ -28,7 +28,7 @@
         <Border Grid.ColumnSpan="2" Background="#252525"
                 MouseDown="Border_MouseDown">
             <Grid HorizontalAlignment="Stretch">
-                <Label Content="Just a Chat"
+                <Label Content="Our discord"
                        Foreground="Gray"
                        FontWeight="SemiBold"/>
                 <StackPanel HorizontalAlignment="Right"
@@ -113,7 +113,7 @@
             <Border BorderBrush="#2F3136"
                 BorderThickness="0,0,0,2">
                 <Grid HorizontalAlignment="Stretch" Margin="8">
-                    <Label Content="@ChatChannel" Foreground="White" FontWeight="Bold" Margin="5,0,5,0"
+                    <Label Content="Chat" Foreground="White" FontWeight="Bold" Margin="5,0,5,0"
                            VerticalAlignment="Center"/>
 
                 </Grid>
@@ -129,37 +129,32 @@
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="55*"/>
-                    <ColumnDefinition Width="127*"/>
-                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBox Height="50" Margin="10,10,10,10"
-                         Name = "MessageInput" Text="{Binding Message,
-                        UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                         Name="MessageInput" Text="{Binding Message,  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                          Background="#3e4147" BorderBrush="Gray"
-                         TextWrapping="Wrap" Grid.ColumnSpan="3"
+                         TextWrapping="Wrap" Grid.Column="0"
                          Foreground="White">
                     <TextBox.InputBindings>
                         <KeyBinding Command="{Binding SendMessageCommand}" Key="Return"/>
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <TextBlock IsHitTestVisible="False"
-                           Text="@Message" VerticalAlignment="Top"
-                           HorizontalAlignment="Left"
-                           Margin="15,10,0,0" Foreground="DarkGray" Grid.ColumnSpan="2" Height="24" Width="895">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName= MessageInput}" Value="">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                <Button Content="Send"
+                        Width="75" Height="50" Margin="10"
+                        Command="{Binding SendMessageCommand}"
+                        Background="#FF7DDA7D" Foreground="Black"
+                        Grid.Column="1"/>
+
+                <Button Content="🎤 Record"
+                        Width="100" Height="50" Margin="10"
+                        Command="{Binding StartVoiceRecordingCommand}"
+                        Background="#626771" Foreground="White"
+                        Grid.Column="2"/>
             </Grid>
         </Grid>
     </Grid>
