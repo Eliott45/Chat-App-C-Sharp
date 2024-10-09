@@ -10,8 +10,8 @@ namespace ChatClient.MVVM.ViewModel;
 
 internal class MainViewModel : ObservableObject, IDisposable
 {
-    public ObservableCollection<UserModel> Users { get; set; }
-    public ObservableCollection<string> Messages { get; set; }
+    public ObservableCollection<UserModel> Users { get; set; } = new();
+    public ObservableCollection<string> Messages { get; set; } = new();
     public RelayCommand ConnectToServerCommand { get; set; }
     public RelayCommand SendMessageCommand { get; set; }
     public string IpAddress { get; set; }
@@ -27,17 +27,12 @@ internal class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private readonly Server _server;
+    private readonly Server _server = new();
 
-    private bool _connectedToServer;
     private string _message;
 
     public MainViewModel()
     {
-        Users = new ObservableCollection<UserModel>();
-        Messages = new ObservableCollection<string>();
-        _server = new Server();
-
         SubscribeToServer();
         CreateServerCommands();
     }
